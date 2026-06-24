@@ -25,7 +25,7 @@ M.get_projects = function(on_done)
 	vim.system({ "forgesync", "projects", "--json" }, { text = true }, on_exit)
 end
 
-M.sync = function(on_done)
+M.sync = function(on_done, repo_filter)
 	local on_exit = function(result)
 		local ok, decoded
 		vim.schedule(function()
@@ -47,10 +47,10 @@ M.sync = function(on_done)
 		end)
 	end
 
-	vim.system({ "forgesync", "sync", "--json" }, { text = true }, on_exit)
+	vim.system({ "forgesync", "sync", "--repo", repo_filter, "--json" }, { text = true }, on_exit)
 end
 
-M.status = function(on_done)
+M.status = function(on_done, repo_filter)
 	local on_exit = function(result)
 		local ok, decoded
 		vim.schedule(function()
@@ -72,7 +72,7 @@ M.status = function(on_done)
 		end)
 	end
 
-	vim.system({ "forgesync", "status", "--json" }, { text = true }, on_exit)
+	vim.system({ "forgesync", "status", "--repo", repo_filter, "--json" }, { text = true }, on_exit)
 end
 
 return M
