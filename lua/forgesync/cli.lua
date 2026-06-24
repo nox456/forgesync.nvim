@@ -47,7 +47,7 @@ M.sync = function(on_done, repo_filter)
 		end)
 	end
 
-	vim.system({ "forgesync", "sync", "--repo", repo_filter, "--json" }, { text = true }, on_exit)
+	vim.system({ "forgesync", "sync", "--repo", repo_filter or "", "--json" }, { text = true }, on_exit)
 end
 
 M.status = function(on_done, repo_filter)
@@ -72,7 +72,7 @@ M.status = function(on_done, repo_filter)
 		end)
 	end
 
-	vim.system({ "forgesync", "status", "--repo", repo_filter, "--json" }, { text = true }, on_exit)
+	vim.system({ "forgesync", "status", "--repo", repo_filter or "", "--json" }, { text = true }, on_exit)
 end
 
 return M
