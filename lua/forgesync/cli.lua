@@ -1,6 +1,12 @@
 local M = {}
 
+M.cache = {}
+
 M.get_projects = function(on_done)
+	if M.cache.projects then
+		on_done(M.cache.projects)
+		return
+	end
 	local on_exit = function(result)
 		local ok, decoded
 		vim.schedule(function()
@@ -18,6 +24,7 @@ M.get_projects = function(on_done)
 		end)
 
 		vim.schedule(function()
+			M.cache.projects = decoded.projects
 			on_done(decoded.projects)
 		end)
 	end
