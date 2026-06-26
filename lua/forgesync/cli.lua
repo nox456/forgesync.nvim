@@ -4,7 +4,7 @@ M.cache = {}
 
 M.get_projects = function(on_done)
 	if M.cache.projects then
-		on_done(M.cache.projects)
+		on_done(nil, M.cache.projects)
 		return
 	end
 	local on_exit = function(result)
@@ -14,18 +14,18 @@ M.get_projects = function(on_done)
 				ok, decoded = pcall(vim.json.decode, result.stdout)
 			else
 				vim.notify("Failed to get projects: " .. result.stderr, vim.log.levels.ERROR)
+				on_done(result.stderr, nil)
 				return
 			end
 
 			if not ok then
 				vim.notify("Failed to decode JSON", vim.log.levels.ERROR)
+				on_done("Failed to decode JSON", nil)
 				return
 			end
-		end)
 
-		vim.schedule(function()
 			M.cache.projects = decoded.projects
-			on_done(decoded.projects)
+			on_done(nil, decoded.projects)
 		end)
 	end
 
@@ -40,17 +40,16 @@ M.sync = function(on_done, repo_filter)
 				ok, decoded = pcall(vim.json.decode, result.stdout)
 			else
 				vim.notify("Failed to sync: " .. result.stderr, vim.log.levels.ERROR)
+				on_done(result.stderr, nil)
 				return
 			end
 
 			if not ok then
 				vim.notify("Failed to decode JSON", vim.log.levels.ERROR)
+				on_done("Failed to decode JSON", nil)
 				return
 			end
-		end)
-
-		vim.schedule(function()
-			on_done(decoded.report)
+			on_done(nil, decoded.report)
 		end)
 	end
 
@@ -65,17 +64,16 @@ M.status = function(on_done, repo_filter)
 				ok, decoded = pcall(vim.json.decode, result.stdout)
 			else
 				vim.notify("Failed to get status: " .. result.stderr, vim.log.levels.ERROR)
+				on_done(result.stderr, nil)
 				return
 			end
 
 			if not ok then
 				vim.notify("Failed to decode JSON", vim.log.levels.ERROR)
+				on_done("Failed to decode JSON", nil)
 				return
 			end
-		end)
-
-		vim.schedule(function()
-			on_done(decoded.rows)
+			on_done(nil, decoded.rows)
 		end)
 	end
 
