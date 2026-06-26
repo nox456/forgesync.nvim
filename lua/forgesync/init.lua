@@ -1,4 +1,7 @@
+require("forgesync.commands")
+
 local config = require("forgesync.config")
+vim.notify = require("notify")
 
 local M = {}
 
