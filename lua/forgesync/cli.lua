@@ -24,6 +24,11 @@ M.get_projects = function(on_done)
 				return
 			end
 
+			if not decoded.projects then
+				on_done("Missing projects key", nil)
+				return
+			end
+
 			M.cache.projects = decoded.projects
 			on_done(nil, decoded.projects)
 		end)
@@ -47,6 +52,12 @@ M.sync = function(on_done, repo_filter)
 				on_done("Failed to decode JSON", nil)
 				return
 			end
+
+			if not decoded.report then
+				on_done("Missing report key", nil)
+				return
+			end
+
 			on_done(nil, decoded.report)
 		end)
 	end
@@ -76,6 +87,12 @@ M.status = function(on_done, repo_filter)
 				on_done("Failed to decode JSON", nil)
 				return
 			end
+
+			if not decoded.rows then
+				on_done("Missing rows key", nil)
+				return
+			end
+
 			on_done(nil, decoded.rows)
 		end)
 	end
