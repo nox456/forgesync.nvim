@@ -14,7 +14,7 @@ M.run = function(repo_filter)
 	local on_done = function(err, report)
 		is_syncing = false
 		if err then
-			vim.notify("Sync failed", vim.log.levels.ERROR, { title = "ForgeSync" })
+			vim.notify("Sync failed: " .. err, vim.log.levels.ERROR, { title = "ForgeSync" })
 			return
 		end
 		vim.notify("Synced!", vim.log.levels.INFO, { title = "ForgeSync" })
