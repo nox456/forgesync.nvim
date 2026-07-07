@@ -4,7 +4,9 @@ M.cache = {}
 
 M.get_projects = function(on_done)
 	if M.cache.projects then
-		on_done(nil, M.cache.projects)
+		vim.schedule(function()
+			on_done(nil, M.cache.projects)
+		end)
 		return
 	end
 	local on_exit = function(result)
