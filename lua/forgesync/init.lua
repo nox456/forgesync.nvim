@@ -4,7 +4,7 @@ local M = {}
 
 function M.setup(opts)
 	require("forgesync.commands")
-	M.config = config.merges(opts or {})
+	M.config = config.merge(opts or {})
 end
 
 return M
