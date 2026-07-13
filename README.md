@@ -22,14 +22,14 @@ Three features, each mapping to one CLI command.
 
 ### Background sync with notifications
 
-`:ForgesyncSync` runs `forgesync sync` in the background without blocking the
+`:ForgeSync` runs `forgesync sync` in the background without blocking the
 editor. You get a notification when it starts and a summary when it finishes
 (`2 created, 1 updated`) — or the error message if it fails. A built-in guard
 prevents two syncs from running at once.
 
 ### Status dashboard
 
-`:ForgesyncDashboard` opens a floating window with a read-only table of every
+`:ForgeSyncDashboard` opens a floating window with a read-only table of every
 issue forgesync tracks: issue number, title, project, repo, status, whether it
 has a linked PR, and whether it's already in sync. Press `r` to refresh, `q` to
 close. It only reads — it never writes to Notion.
@@ -123,10 +123,10 @@ require("forgesync").setup({
 
 ### Commands
 
-| Command               | Action                                       |
-| --------------------- | -------------------------------------------- |
-| `:ForgesyncSync`      | Run a full background sync and notify the result |
-| `:ForgesyncDashboard` | Open the read-only status dashboard          |
+| Command               | Action                                           |
+| --------------------- | ------------------------------------------------ |
+| `:ForgeSync`          | Run a full background sync and notify the result |
+| `:ForgeSyncDashboard` | Open the read-only status dashboard              |
 
 ### Dashboard keys
 
@@ -164,7 +164,7 @@ nothing.
 ## How it works
 
 ```
-  :ForgesyncSync
+  :ForgeSync
         │
         ▼
   forgesync.nvim ──vim.system──▶ forgesync (Go) ──▶ GitHub + Notion
