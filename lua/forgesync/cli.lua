@@ -24,7 +24,7 @@ M.get_projects = function(on_done)
 				return
 			end
 
-			if not decoded.projects then
+			if not decoded.projects or decoded.projects == vim.NIL then
 				on_done("Missing projects key", nil)
 				return
 			end
