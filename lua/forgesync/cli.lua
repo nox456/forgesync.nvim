@@ -97,7 +97,7 @@ M.status = function(on_done, repo_filter)
 		end)
 	end
 
-	local cmd = { "forgesync", "sync", "--json" }
+	local cmd = { "forgesync", "status", "--json" }
 
 	if repo_filter then
 		table.insert(cmd, "--repo")
