@@ -3,7 +3,7 @@ local config = require("forgesync.config")
 local M = {}
 
 function M.setup(opts)
-	M.config = config.merge(opts or {})
+	M.options = config.merge(opts or {})
 	require("forgesync.commands")
 end
 

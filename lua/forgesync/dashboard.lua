@@ -1,7 +1,7 @@
 local M = {}
 
-local BUF = nil
-local WIN = nil
+local BUF = 0
+local WIN = 0
 local IS_LOADING = false
 local MIN_TITLE = 20
 local HEADERS = {
@@ -106,6 +106,72 @@ local function render_lines(cells, widths)
 	return lines
 end
 
-M.open = function() end
+local function set_content(lines)
+	if not vim.api.nvim_buf_is_valid(BUF) then
+		return
+	end
+
+	vim.bo[BUF].modifiable = true
+
+	vim.api.nvim_buf_set_lines(BUF, 0, -1, false, lines)
+
+	vim.bo[BUF].modifiable = false
+end
+
+M.open = function()
+	if WIN ~= 0 and vim.api.nvim_win_is_valid(WIN) then
+		vim.api.nvim_set_current_win(WIN)
+		return
+	end
+
+	local cfg = require("forgesync").options.dashboard
+
+	local buf = vim.api.nvim_create_buf(false, true)
+	assert(buf ~= 0, "forgesync.nvim: failed to create dashboard buffer")
+	BUF = buf
+
+	vim.bo[BUF].buftype = "nofile"
+	vim.bo[BUF].bufhidden = "wipe"
+	vim.bo[BUF].filetype = "forgesync-dashboard"
+
+	set_content({ "Loading…" })
+
+	local win_width = math.min(cfg.max_width, math.floor(vim.o.columns * 0.8))
+	local win_height = math.min(cfg.max_height, math.floor(vim.o.lines * 0.8))
+	WIN = vim.api.nvim_open_win(BUF, true, {
+		relative = "editor",
+		width = win_width,
+		height = win_height,
+		row = math.floor((vim.o.lines - win_height) / 2),
+		col = math.floor((vim.o.columns - win_width) / 2),
+		style = "minimal",
+		border = cfg.border,
+		title = "ForgeSync",
+	})
+	vim.wo[WIN].wrap = false
+	vim.wo[WIN].cursorline = true
+
+	vim.keymap.set(
+		"n",
+		cfg.keys.close,
+		M.close,
+		{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: close dashboard" }
+	)
+	vim.keymap.set(
+		"n",
+		cfg.keys.refresh,
+		M.refresh,
+		{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: refresh dashboard" }
+	)
+	vim.api.nvim_create_autocmd("BufWipeout", {
+		buffer = BUF,
+		callback = function()
+			BUF = 0
+			WIN = 0
+		end,
+	})
+
+	M.refresh()
+end
 
 return M
