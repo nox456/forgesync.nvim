@@ -151,6 +151,12 @@ M.refresh = function(cfg)
 	cli.status(on_done, "nox456/forgesync")
 end
 
+M.close = function()
+	if WIN ~= 0 and vim.api.nvim_win_is_valid(WIN) then
+		vim.api.nvim_win_close(WIN, true)
+	end
+end
+
 M.open = function()
 	if WIN ~= 0 and vim.api.nvim_win_is_valid(WIN) then
 		vim.api.nvim_set_current_win(WIN)
