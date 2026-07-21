@@ -118,6 +118,39 @@ local function set_content(lines)
 	vim.bo[BUF].modifiable = false
 end
 
+M.refresh = function(cfg)
+	if IS_LOADING then
+		return
+	end
+
+	IS_LOADING = true
+	set_content({ "Loading…" })
+
+	local cli = require("forgesync.cli")
+
+	local on_done = function(err, rows)
+		if err then
+			set_content({ "Error loading forgesync" })
+		elseif #rows == 0 then
+			set_content({ "No issues found" })
+		else
+			local cells = build_cells(rows, cfg.icons)
+			local widths = measure(cells)
+
+			local available = vim.api.nvim_win_get_width(WIN)
+
+			local layouted = layout(widths, available)
+
+			local lines = render_lines(cells, layouted)
+
+			set_content(lines)
+		end
+		IS_LOADING = false
+	end
+
+	cli.status(on_done, "nox456/forgesync")
+end
+
 M.open = function()
 	if WIN ~= 0 and vim.api.nvim_win_is_valid(WIN) then
 		vim.api.nvim_set_current_win(WIN)
@@ -134,10 +167,9 @@ M.open = function()
 	vim.bo[BUF].bufhidden = "wipe"
 	vim.bo[BUF].filetype = "forgesync-dashboard"
 
-	set_content({ "Loading…" })
-
 	local win_width = math.min(cfg.max_width, math.floor(vim.o.columns * 0.8))
 	local win_height = math.min(cfg.max_height, math.floor(vim.o.lines * 0.8))
+
 	WIN = vim.api.nvim_open_win(BUF, true, {
 		relative = "editor",
 		width = win_width,
@@ -148,21 +180,21 @@ M.open = function()
 		border = cfg.border,
 		title = "ForgeSync",
 	})
+
 	vim.wo[WIN].wrap = false
 	vim.wo[WIN].cursorline = true
 
-	vim.keymap.set(
-		"n",
-		cfg.keys.close,
-		M.close,
-		{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: close dashboard" }
-	)
-	vim.keymap.set(
-		"n",
-		cfg.keys.refresh,
-		M.refresh,
-		{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: refresh dashboard" }
-	)
+	-- vim.keymap.set(
+	-- 	"n",
+	-- 	cfg.keys.close,
+	-- 	M.close,
+	-- 	{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: close dashboard" }
+	-- )
+
+	vim.keymap.set("n", cfg.keys.refresh, function()
+		M.refresh(cfg)
+	end, { buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: refresh dashboard" })
+
 	vim.api.nvim_create_autocmd("BufWipeout", {
 		buffer = BUF,
 		callback = function()
@@ -171,7 +203,7 @@ M.open = function()
 		end,
 	})
 
-	M.refresh()
+	M.refresh(cfg)
 end
 
 return M
