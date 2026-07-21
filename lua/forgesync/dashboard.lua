@@ -14,11 +14,13 @@ local HEADERS = {
 
 local function normalize(row, icons)
 	local issue_number = row.issue_number
-	if not row.project_name then
+	local project_name = row.project_name
+	if not row.project_name or row.project_name == vim.NIL then
 		issue_number = row.issue_number .. " (" .. row.issue_repo .. ")"
+		project_name = "[NO PROJECT]"
 	end
 	return {
-		row.project_name or "[NO PROJECT]",
+		project_name,
 		row.issue_title or "[NO TITLE]",
 		row.has_pr and icons.pr or "-",
 		row.is_synced and icons.synced or "-",
