@@ -190,12 +190,12 @@ M.open = function()
 	vim.wo[WIN].wrap = false
 	vim.wo[WIN].cursorline = true
 
-	-- vim.keymap.set(
-	-- 	"n",
-	-- 	cfg.keys.close,
-	-- 	M.close,
-	-- 	{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: close dashboard" }
-	-- )
+	vim.keymap.set(
+		"n",
+		cfg.keys.close,
+		M.close,
+		{ buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: close dashboard" }
+	)
 
 	vim.keymap.set("n", cfg.keys.refresh, function()
 		M.refresh(cfg)
