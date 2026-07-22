@@ -120,7 +120,7 @@ local function set_content(lines)
 	vim.bo[BUF].modifiable = false
 end
 
-M.refresh = function(cfg)
+M.refresh = function(cfg, repo_filter)
 	if IS_LOADING then
 		return
 	end
@@ -150,7 +150,7 @@ M.refresh = function(cfg)
 		IS_LOADING = false
 	end
 
-	cli.status(on_done, "nox456/forgesync")
+	cli.status(on_done, repo_filter)
 end
 
 M.close = function()
@@ -159,7 +159,7 @@ M.close = function()
 	end
 end
 
-M.open = function()
+M.open = function(repo_filter)
 	if WIN ~= 0 and vim.api.nvim_win_is_valid(WIN) then
 		vim.api.nvim_set_current_win(WIN)
 		return
@@ -200,7 +200,7 @@ M.open = function()
 	)
 
 	vim.keymap.set("n", cfg.keys.refresh, function()
-		M.refresh(cfg)
+		M.refresh(cfg, repo_filter)
 	end, { buffer = BUF, nowait = true, silent = true, desc = "ForgeSync: refresh dashboard" })
 
 	vim.api.nvim_create_autocmd("BufWipeout", {
@@ -211,7 +211,7 @@ M.open = function()
 		end,
 	})
 
-	M.refresh(cfg)
+	M.refresh(cfg, repo_filter)
 end
 
 return M

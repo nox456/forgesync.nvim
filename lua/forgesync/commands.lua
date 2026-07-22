@@ -10,10 +10,11 @@ end, {
 	nargs = 1,
 })
 
-vim.api.nvim_create_user_command("ForgeSyncDashboard", function()
-	dashboard.open()
+vim.api.nvim_create_user_command("ForgeSyncDashboard", function(opts)
+	dashboard.open(opts.fargs[1])
 end, {
 	desc = "Open the ForgeSync dashboard",
+	nargs = 1,
 })
 
 vim.api.nvim_create_user_command("ForgeSyncRepository", function(opts)
