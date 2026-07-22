@@ -22,8 +22,8 @@ Three features, each mapping to one CLI command.
 
 ### Background sync with notifications
 
-`:ForgeSync` runs `forgesync sync` in the background without blocking the
-editor. You get a notification when it starts and a summary when it finishes
+`:ForgeSync {repo}` runs `forgesync sync` scoped to that repo in the background
+without blocking the editor. You get a notification when it starts and a summary when it finishes
 (`2 created, 1 updated`) — or the error message if it fails. A built-in guard
 prevents two syncs from running at once.
 
@@ -123,10 +123,11 @@ require("forgesync").setup({
 
 ### Commands
 
-| Command               | Action                                           |
-| --------------------- | ------------------------------------------------ |
-| `:ForgeSync`          | Run a full background sync and notify the result |
-| `:ForgeSyncDashboard` | Open the read-only status dashboard              |
+| Command                        | Action                                                                        |
+| ------------------------------ | ----------------------------------------------------------------------------- |
+| `:ForgeSync {repo}`            | Run a background sync scoped to `{repo}` (`owner/name`) and notify the result  |
+| `:ForgeSyncDashboard {repo}`   | Open the read-only status dashboard for `{repo}`                              |
+| `:ForgeSyncRepository {path}`  | Resolve the repo at `{path}`, confirm it's tracked in Notion, and sync it      |
 
 ### Dashboard keys
 
@@ -137,27 +138,28 @@ require("forgesync").setup({
 
 ### Auto-sync on project switch
 
-Auto-sync needs to know when you've switched projects. forgesync.nvim listens for
-a custom `User` autocommand — `ForgesyncProjectLoaded` — carrying the new project
-path. You fire it from wherever your project picker changes directory.
+Auto-sync is driven by the `:ForgeSyncRepository {path}` command. Point it at a
+project directory and it resolves that repo (`owner/name`) with `gh`, confirms the
+repo is tracked in your Notion projects, and — if it is — runs a scoped
+`forgesync sync --repo owner/name` in the background. An untracked repo (or a
+directory `gh` can't resolve) stops with a notification and syncs nothing.
 
-With [telescope-project.nvim](https://github.com/nvim-telescope/telescope-project.nvim),
+To make it automatic, call the command from wherever your project picker changes
+directory. With [telescope-project.nvim](https://github.com/nvim-telescope/telescope-project.nvim),
 that's one extra line inside your existing `on_project_selected` hook:
 
 ```lua
 on_project_selected = function(prompt_bufnr)
   project_actions.change_working_directory(prompt_bufnr)
-  vim.api.nvim_exec_autocmds("User", {
-    pattern = "ForgesyncProjectLoaded",
-    data = { path = vim.fn.getcwd() },
-  })
+  vim.cmd("ForgeSyncRepository " .. vim.fn.fnameescape(vim.fn.getcwd()))
 end,
 ```
 
-When the event fires, the plugin resolves the repo (`owner/name`) with `gh`,
-checks it against your tracked Notion projects, and — if it's tracked — runs
-`forgesync sync --repo owner/name` in the background. Untracked projects do
-nothing.
+`vim.fn.fnameescape` matters here: the command takes a single argument, so a
+project path containing spaces has to be escaped or it splits into two.
+
+You can also run it by hand — `:ForgeSyncRepository ~/code/some-project` — which
+the old `User`-event approach never allowed.
 
 ---
 
@@ -189,7 +191,8 @@ one-module change.
 | `forgesync: command not found` | The CLI isn't installed or isn't on Neovim's `PATH`. Confirm with `:!forgesync version`. |
 | "Sync failed" with a config error | The CLI isn't configured. Run `forgesync projects` in a terminal to see the real error. |
 | No notifications appear | No `vim.notify` handler is installed. Add snacks.nvim (or noice.nvim) for a proper notifier. |
-| Auto-sync never runs | The `ForgesyncProjectLoaded` event isn't wired up, `gh` isn't authenticated, or the repo isn't tracked in Notion. |
+| Auto-sync never runs | The `:ForgeSyncRepository` call isn't wired into your project-switch hook, `gh` isn't authenticated, or the repo isn't tracked in Notion. |
+| `:ForgeSyncRepository` errors with "Too many arguments" | The project path contains spaces. Escape it — e.g. `vim.fn.fnameescape(path)` — or the command splits it into two arguments. |
 
 ---
 
