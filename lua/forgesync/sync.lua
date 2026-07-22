@@ -1,3 +1,5 @@
+local notify = require("utils.notify")
+
 local M = {}
 
 local cli = require("forgesync.cli")
@@ -5,28 +7,24 @@ local is_syncing = false
 
 M.run = function(repo_filter)
 	if is_syncing then
-		vim.notify("Already syncing...", vim.log.levels.WARN, { title = "ForgeSync" })
+		notify.warn("Already syncing...")
 		return
 	end
 	is_syncing = true
-	vim.notify("Syncing...", vim.log.levels.INFO, { title = "ForgeSync" })
+	notify.info("Syncing...")
 
 	local on_done = function(err, report)
 		is_syncing = false
 		if err then
-			vim.notify("Sync failed: " .. err, vim.log.levels.ERROR, { title = "ForgeSync" })
+			notify.error("Sync failed: " .. err)
 			return
 		end
-		vim.notify("Synced!", vim.log.levels.INFO, { title = "ForgeSync" })
+		notify.info("Synced!")
 		local created = report.created
 		local updated = report.updated
 		local unchanged = report.unchanged
 
-		vim.notify(
-			created .. " created, " .. updated .. " updated, " .. unchanged .. " unchanged",
-			vim.log.levels.INFO,
-			{ title = "ForgeSync" }
-		)
+		notify.info(created .. " created, " .. updated .. " updated, " .. unchanged .. " unchanged")
 	end
 
 	cli.sync(on_done, repo_filter)

@@ -1,6 +1,7 @@
 local sync = require("forgesync.sync")
 local dashboard = require("forgesync.dashboard")
 local cli = require("forgesync.cli")
+local notify = require("utils.notify")
 
 vim.api.nvim_create_user_command("ForgeSync", function(opts)
 	sync.run(opts.fargs[1])
@@ -18,20 +19,21 @@ end, {
 vim.api.nvim_create_user_command("ForgeSyncRepository", function(opts)
 	local path = opts.fargs[1]
 
+	notify.info("Trying to sync repository...")
 	cli.resolve_repo(path, function(err_resolve, repo)
 		if err_resolve then
-			vim.notify(err_resolve, vim.log.levels.ERROR)
+			notify.error(err_resolve)
 			return
 		end
 
 		local on_projects_done = function(err_projects, projects)
 			if err_projects or not projects then
-				vim.notify(err_projects, vim.log.levels.ERROR)
+				notify.error(err_projects)
 				return
 			end
 
 			if #projects == 0 then
-				vim.notify("No projects found", vim.log.levels.WARN)
+				notify.warn("No projects found")
 				return
 			end
 
@@ -45,7 +47,7 @@ vim.api.nvim_create_user_command("ForgeSyncRepository", function(opts)
 			end
 
 			if not project then
-				vim.notify("No project found for repo " .. repo, vim.log.levels.WARN)
+				notify.warn("No project found for repo " .. repo)
 				return
 			end
 
