@@ -18,7 +18,7 @@ end, {
 })
 
 vim.api.nvim_create_user_command("ForgeSyncRepository", function(opts)
-	local path = opts.fargs[1]
+	local path = vim.fn.fnameescape(opts.args)
 
 	notify.info("Trying to sync repository...")
 	cli.resolve_repo(path, function(err_resolve, repo)
@@ -59,5 +59,6 @@ vim.api.nvim_create_user_command("ForgeSyncRepository", function(opts)
 	end)
 end, {
 	desc = "Perform a ForgeSync sync process for the given repository",
+	complete = "dir",
 	nargs = 1,
 })
