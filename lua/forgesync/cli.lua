@@ -107,4 +107,23 @@ M.status = function(on_done, repo_filter)
 	vim.system(cmd, { text = true }, on_exit)
 end
 
+M.resolve_repo = function(path, on_done)
+	local on_exit = function(result)
+		vim.schedule(function()
+			if result.code == 0 then
+				on_done(nil, string.sub(result.stdout, 1, -2))
+				return
+			end
+
+			on_done(result.stderr, nil)
+		end)
+	end
+
+	vim.system(
+		{ "gh", "repo", "view", "--json", "nameWithOwner", "-q", ".nameWithOwner" },
+		{ text = true, cwd = path },
+		on_exit
+	)
+end
+
 return M
