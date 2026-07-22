@@ -111,7 +111,7 @@ M.resolve_repo = function(path, on_done)
 	local on_exit = function(result)
 		vim.schedule(function()
 			if result.code == 0 then
-				on_done(nil, string.sub(result.stdout, 1, -2))
+				on_done(nil, vim.trim(result.stdout))
 				return
 			end
 
